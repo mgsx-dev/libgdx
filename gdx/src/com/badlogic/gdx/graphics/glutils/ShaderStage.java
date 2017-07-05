@@ -17,6 +17,7 @@
 package com.badlogic.gdx.graphics.glutils;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.GL30;
 
 /**
  * Shader file extension is following official convention
@@ -24,6 +25,7 @@ import com.badlogic.gdx.graphics.GL20;
  * <ul>
  *   <li>.vert - a vertex shader</li>
  *   <li>.frag - a fragment shader</li>
+ *   <li>.geom - a geometry shader</li>
  * </ul>
  * 
  * @author mgsx
@@ -33,8 +35,9 @@ public class ShaderStage {
 	
 	public static final ShaderStage vertex = new ShaderStage(GL20.GL_VERTEX_SHADER, "Vertex", ".vert");
 	public static final ShaderStage fragment = new ShaderStage(GL20.GL_FRAGMENT_SHADER, "Fragment", ".frag");
+	public static final ShaderStage geometry = new ShaderStage(GL30.GL_GEOMETRY_SHADER, "Geometry", ".geom");
 	
-	public static final ShaderStage [] stages = {vertex, fragment};
+	public static final ShaderStage [] stages = {vertex, fragment, geometry};
 	
 	public final int type;
 	public final String name;
