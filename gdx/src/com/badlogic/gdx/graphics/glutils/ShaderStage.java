@@ -26,6 +26,8 @@ import com.badlogic.gdx.graphics.GL30;
  *   <li>.vert - a vertex shader</li>
  *   <li>.frag - a fragment shader</li>
  *   <li>.geom - a geometry shader</li>
+ *   <li>.tesc - a tessellation control shader</li>
+ *   <li>.tese - a tessellation evaluation shader</li>
  * </ul>
  * 
  * @author mgsx
@@ -36,8 +38,10 @@ public class ShaderStage {
 	public static final ShaderStage vertex = new ShaderStage(GL20.GL_VERTEX_SHADER, "Vertex", ".vert");
 	public static final ShaderStage fragment = new ShaderStage(GL20.GL_FRAGMENT_SHADER, "Fragment", ".frag");
 	public static final ShaderStage geometry = new ShaderStage(GL30.GL_GEOMETRY_SHADER, "Geometry", ".geom");
+	public static final ShaderStage tesslationControl = new ShaderStage(GL30.GL_TESS_CONTROL_SHADER, "Tesslation Control", ".tesc");
+	public static final ShaderStage tesslationEvaluation = new ShaderStage(GL30.GL_TESS_EVALUATION_SHADER, "Tesslation Evaluation", ".tese");
 	
-	public static final ShaderStage [] stages = {vertex, fragment, geometry};
+	public static final ShaderStage [] stages = {vertex, fragment, geometry, tesslationControl, tesslationEvaluation};
 	
 	public final int type;
 	public final String name;
