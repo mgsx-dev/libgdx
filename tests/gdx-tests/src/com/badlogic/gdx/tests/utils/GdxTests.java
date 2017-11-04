@@ -66,6 +66,7 @@ import com.badlogic.gdx.tests.g3d.ParticleControllerTest;
 import com.badlogic.gdx.tests.g3d.ShaderCollectionTest;
 import com.badlogic.gdx.tests.g3d.ShaderTest;
 import com.badlogic.gdx.tests.g3d.ShadowMappingTest;
+import com.badlogic.gdx.tests.g3d.SimpleGeometryShaderTest;
 import com.badlogic.gdx.tests.g3d.SkeletonTest;
 import com.badlogic.gdx.tests.g3d.TextureArrayTest;
 import com.badlogic.gdx.tests.g3d.TextureRegion3DTest;
@@ -209,6 +210,7 @@ public class GdxTests {
 		ShapeRendererTest.class,
 		SimpleAnimationTest.class,
 		SimpleDecalTest.class,
+		SimpleGeometryShaderTest.class,
 		SimpleStageCullingTest.class,
 		SimpleVertexShader.class,
 		SkeletonTest.class,
