@@ -35,6 +35,7 @@ import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL40;
 import org.lwjgl.opengl.GL41;
+import org.lwjgl.opengl.GL42;
 import org.lwjgl.opengl.GL43;
 
 import com.badlogic.gdx.utils.GdxRuntimeException;
@@ -647,5 +648,20 @@ class LwjglGL30 extends LwjglGL20 implements com.badlogic.gdx.graphics.GL30 {
 	public void glInvalidateSubFramebuffer (int target, int numAttachments, IntBuffer attachments, int x, int y, int width,
 		int height) {
 		GL43.glInvalidateSubFramebuffer(target, attachments, x, y, width, height);
+	}
+
+	@Override
+	public void glDispatchCompute (int num_groups_x, int num_groups_y, int num_groups_z) {
+		GL43.glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+	}
+
+	@Override
+	public void glMemoryBarrier (int barriers) {
+		GL42.glMemoryBarrier(barriers);
+	}
+
+	@Override
+	public void glBindImageTexture (int unit, int texture, int level, boolean layered, int layer, int access, int format) {
+		GL42.glBindImageTexture(unit, texture, level, layered, layer, access, format);
 	}
 }

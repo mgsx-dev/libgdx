@@ -1881,4 +1881,25 @@ public class GL30Interceptor extends GLInterceptor implements GL30 {
 		gl30.glInvalidateSubFramebuffer(target, numAttachments, attachments, x, y, width, height);
 		check();
 	}
+
+	@Override
+	public void glDispatchCompute (int num_groups_x, int num_groups_y, int num_groups_z) {
+		calls++;
+		gl30.glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
+		check();
+	}
+
+	@Override
+	public void glMemoryBarrier (int barriers) {
+		calls++;
+		gl30.glMemoryBarrier(barriers);
+		check();
+	}
+
+	@Override
+	public void glBindImageTexture (int unit, int texture, int level, boolean layered, int layer, int access, int format) {
+		calls++;
+		gl30.glBindImageTexture(unit, texture, level, layered, layer, access, format);
+		check();
+	}
 }

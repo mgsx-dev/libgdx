@@ -49,6 +49,7 @@ import com.badlogic.gdx.tests.extensions.FreeTypeMetricsTest;
 import com.badlogic.gdx.tests.extensions.FreeTypePackTest;
 import com.badlogic.gdx.tests.extensions.FreeTypeTest;
 import com.badlogic.gdx.tests.extensions.InternationalFontsTest;
+import com.badlogic.gdx.tests.g2d.SimpleComputeShaderTest;
 import com.badlogic.gdx.tests.g3d.Animation3DTest;
 import com.badlogic.gdx.tests.g3d.Basic3DSceneTest;
 import com.badlogic.gdx.tests.g3d.Basic3DTest;
@@ -211,6 +212,7 @@ public class GdxTests {
 		ShadowMappingTest.class,
 		ShapeRendererTest.class,
 		SimpleAnimationTest.class,
+		SimpleComputeShaderTest.class,
 		SimpleDecalTest.class,
 		SimpleGeometryShaderTest.class,
 		SimplePNTriangleTesslation.class,
