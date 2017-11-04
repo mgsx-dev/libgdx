@@ -50,7 +50,7 @@ public class SimpleTesslationShaderTest extends GdxTest {
 		String vertexShader =
 			  "attribute vec4 a_position;          \n"
 			+ "attribute vec3 a_normal;				\n"
-			+ "out vec3 v_normal;						\n"
+			+ "varying vec3 v_normal;						\n"
 			+ "void main()	{								\n"
 			+ "	v_normal = a_normal;					\n"
 			+ "   gl_Position = a_position;  		\n"
