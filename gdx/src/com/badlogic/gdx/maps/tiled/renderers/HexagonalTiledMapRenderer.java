@@ -25,6 +25,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
+import com.badlogic.gdx.math.Vector2;
 
 public class HexagonalTiledMapRenderer extends BatchTiledMapRenderer {
 
@@ -253,5 +254,16 @@ public class HexagonalTiledMapRenderer extends BatchTiledMapRenderer {
 				batch.draw(region.getTexture(), vertices, 0, NUM_VERTICES);
 			}
 		}
+	}
+
+	@Override
+	public Vector2 worldToTileCoordinates (TiledMapTileLayer layer, Vector2 worldPosition) {
+		return worldPosition; // TODO
+	}
+	
+	@Override
+	public Vector2 tileToWorldCoordinates (TiledMapTileLayer layer, Vector2 tilePosition) {
+		// TODO Auto-generated method stub
+		return tilePosition;
 	}
 }

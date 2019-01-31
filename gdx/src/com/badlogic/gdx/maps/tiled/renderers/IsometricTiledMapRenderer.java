@@ -231,4 +231,38 @@ public class IsometricTiledMapRenderer extends BatchTiledMapRenderer {
 			}
 		}
 	}
+
+	@Override
+	public Vector2 worldToTileCoordinates (TiledMapTileLayer layer, Vector2 worldPosition) {
+      float tileWidth = layer.getTileWidth() * unitScale;
+      float tileHeight = layer.getTileHeight() * unitScale;
+      float offsetX = layer.getRenderOffsetX() * unitScale;
+      float offsetY = layer.getRenderOffsetY() * unitScale;
+      
+      float projX = (worldPosition.x - offsetX) / tileWidth;
+      float projY = (worldPosition.y + offsetY) / tileHeight - .5f;
+      
+      float newPosX = projX - projY;
+      float newPosY = projX + projY;
+
+      return worldPosition.set(newPosX, newPosY);
+	}
+	
+	@Override
+	public Vector2 tileToWorldCoordinates (TiledMapTileLayer layer, Vector2 tilePosition) {
+      float tileWidth = layer.getTileWidth() * unitScale;
+      float tileHeight = layer.getTileHeight() * unitScale;
+      float offsetX = layer.getRenderOffsetX() * unitScale;
+      float offsetY = layer.getRenderOffsetY() * unitScale;
+      
+      Vector2 vec = topRight.set((tilePosition.y+.5f)/2, -(tilePosition.x-.5f)/4 );
+      
+      screenPos.set(vec.x, vec.y, 0);
+		screenPos.mul(invIsotransform);
+		
+      float newPosX = (screenPos.x) * tileWidth + offsetX;
+      float newPosY = (screenPos.y) * tileHeight - offsetY;
+
+      return tilePosition.set(newPosX, newPosY);
+	}
 }

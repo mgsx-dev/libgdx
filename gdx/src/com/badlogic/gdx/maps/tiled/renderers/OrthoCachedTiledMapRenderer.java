@@ -36,6 +36,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
 /** Renders ortho tiles by caching geometry on the GPU. How much is cached is controlled by {@link #setOverCache(float)}. When the
@@ -447,5 +448,19 @@ public class OrthoCachedTiledMapRenderer implements TiledMapRenderer, Disposable
 	@Override
 	public void dispose () {
 		spriteCache.dispose();
+	}
+
+	@Override
+	public Vector2 worldToTileCoordinates (TiledMapTileLayer layer, Vector2 worldPosition) {
+		float tileX = (worldPosition.x / unitScale - layer.getRenderOffsetX()) / layer.getTileWidth();
+		float tileY = (worldPosition.y / unitScale - layer.getRenderOffsetY()) / layer.getTileHeight();
+		return worldPosition.set(tileX, tileY);
+	}
+	
+	@Override
+	public Vector2 tileToWorldCoordinates (TiledMapTileLayer layer, Vector2 tilePosition) {
+		float worldX = (tilePosition.x * layer.getTileWidth() + layer.getRenderOffsetX()) * unitScale;
+		float worldY = (tilePosition.y * layer.getTileHeight() + layer.getRenderOffsetY()) * unitScale;
+		return tilePosition.set(worldX, worldY);
 	}
 }

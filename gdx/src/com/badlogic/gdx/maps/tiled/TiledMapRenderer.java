@@ -19,6 +19,7 @@ package com.badlogic.gdx.maps.tiled;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapRenderer;
+import com.badlogic.gdx.math.Vector2;
 
 public interface TiledMapRenderer extends MapRenderer {
 	public void renderObjects (MapLayer layer);
@@ -26,4 +27,20 @@ public interface TiledMapRenderer extends MapRenderer {
 
 	public void renderTileLayer (TiledMapTileLayer layer);
 	public void renderImageLayer(TiledMapImageLayer layer);
+	
+	/**
+	 * Transform the specified world coordinate to tile coordinates.
+	 * @param layer Tile layer reference
+	 * @param worldPosition The point in world coordinates
+	 * @return The vector that was passed in, transformed to tile coordinates.
+	 */
+	public Vector2 worldToTileCoordinates (TiledMapTileLayer layer, Vector2 worldPosition);
+	
+	/**
+	 * Transform the specified tile coordinate to world coordinates.
+	 * @param layer Tile layer reference
+	 * @param tilePosition The point in tile coordinates
+	 * @return The vector that was passed in, transformed to world coordinates.
+	 */
+	public Vector2 tileToWorldCoordinates (TiledMapTileLayer layer, Vector2 tilePosition);
 }

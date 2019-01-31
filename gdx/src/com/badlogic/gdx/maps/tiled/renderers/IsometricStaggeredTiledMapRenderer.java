@@ -25,6 +25,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.Vector2;
 
 public class IsometricStaggeredTiledMapRenderer extends BatchTiledMapRenderer {
 
@@ -186,5 +187,16 @@ public class IsometricStaggeredTiledMapRenderer extends BatchTiledMapRenderer {
 				}
 			}
 		}
+	}
+
+	@Override
+	public Vector2 worldToTileCoordinates (TiledMapTileLayer layer, Vector2 worldPosition) {
+		return worldPosition; // TODO
+	}
+
+	@Override
+	public Vector2 tileToWorldCoordinates (TiledMapTileLayer layer, Vector2 tilePosition) {
+		// TODO Auto-generated method stub
+		return tilePosition;
 	}
 }

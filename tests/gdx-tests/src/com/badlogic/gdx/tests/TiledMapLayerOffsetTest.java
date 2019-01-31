@@ -29,12 +29,18 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.HexagonalTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricStaggeredTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.IsometricTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.GridPoint2;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.tests.utils.GdxTest;
 import com.badlogic.gdx.tests.utils.OrthoCamController;
 import com.badlogic.gdx.utils.Disposable;
@@ -54,6 +60,13 @@ public class TiledMapLayerOffsetTest extends GdxTest {
 	private SpriteBatch batch;
 	private ShapeRenderer shapeRenderer;
 	private int mapType = 0;
+	private Vector3 screenPos = new Vector3();
+	private Vector2 worldPos = new Vector2();
+	private Vector2 tilePosA = new Vector2();
+	private Vector2 tilePosB = new Vector2();
+	private Vector2 tilePosC = new Vector2();
+	private Vector2 tilePosD = new Vector2();
+	private boolean showGrid = true;
 
 	@Override
 	public void create () {
@@ -134,6 +147,17 @@ public class TiledMapLayerOffsetTest extends GdxTest {
 
 		Gdx.gl.glClearColor(100f / 255f, 100f / 255f, 250f / 255f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.PLUS)){
+			camera.zoom /= 2;
+		}
+		if(Gdx.input.isKeyJustPressed(Input.Keys.MINUS)){
+			camera.zoom *= 2;
+		}
+		if(Gdx.input.isKeyJustPressed(Input.Keys.G)){
+			showGrid = !showGrid;
+		}
+		
 		camera.update();
 
 		// add margin to view bounds so it is easy to see any issues with clipping, calculated same way as
@@ -146,7 +170,14 @@ public class TiledMapLayerOffsetTest extends GdxTest {
 		final float x = camera.position.x - w / 2;
 		final float y = camera.position.y - h / 2;
 		renderer.setView(camera.combined, x, y, w, h);
-		renderer.render();
+		
+		int currentLayerIndex = 0;
+		TiledMapTileLayer currentLayer = (TiledMapTileLayer)map.getLayers().get(currentLayerIndex);
+		
+		// currentLayer.setOffsetX(10);
+		// currentLayer.setOffsetY(0);
+		
+		renderer.render(/*new int[]{currentLayerIndex}*/);
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeType.Line);
@@ -154,9 +185,61 @@ public class TiledMapLayerOffsetTest extends GdxTest {
 		shapeRenderer.rect(x, y, w, h);
 		shapeRenderer.end();
 
+		screenPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+		camera.unproject(screenPos);
+		renderer.worldToTileCoordinates(currentLayer, worldPos.set(screenPos.x, screenPos.y));
+		
+		shapeRenderer.begin(ShapeType.Line);
+		
+		if(showGrid){
+			int gridSize = 10;
+			int nLines = gridSize+1;
+			shapeRenderer.setColor(Color.RED);
+			for(int ty=0 ; ty<nLines ; ty++){
+				renderer.tileToWorldCoordinates(currentLayer, tilePosA.set(0, ty));
+				renderer.tileToWorldCoordinates(currentLayer, tilePosB.set(gridSize, ty));
+				shapeRenderer.line(tilePosA.x, tilePosA.y, tilePosB.x, tilePosB.y);
+			}
+			for(int tx=0 ; tx<nLines ; tx++){
+				renderer.tileToWorldCoordinates(currentLayer, tilePosA.set(tx, 0));
+				renderer.tileToWorldCoordinates(currentLayer, tilePosB.set(tx, gridSize));
+				shapeRenderer.line(tilePosA.x, tilePosA.y, tilePosB.x, tilePosB.y);
+			}
+		}
+		
+		int tileX = MathUtils.floor(worldPos.x);
+		int tileY = MathUtils.floor(worldPos.y);
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+			Cell cell = currentLayer.getCell(tileX, tileY);
+			if(cell != null) cell.setTile(null);
+			if(renderer instanceof OrthoCachedTiledMapRenderer){
+				((OrthoCachedTiledMapRenderer)renderer).invalidateCache();
+			}
+		}
+		
+		renderer.tileToWorldCoordinates(currentLayer, tilePosA.set(tileX,   tileY));
+		renderer.tileToWorldCoordinates(currentLayer, tilePosB.set(tileX+1, tileY));
+		renderer.tileToWorldCoordinates(currentLayer, tilePosC.set(tileX+1, tileY+1));
+		renderer.tileToWorldCoordinates(currentLayer, tilePosD.set(tileX,   tileY+1));
+		
+		shapeRenderer.setColor(Color.YELLOW);
+		shapeRenderer.line(tilePosA, tilePosB);
+		shapeRenderer.line(tilePosB, tilePosC);
+		shapeRenderer.line(tilePosC, tilePosD);
+		shapeRenderer.line(tilePosD, tilePosA);
+		
+		shapeRenderer.end();
+		
 		batch.begin();
+		font.draw(batch, "Tile position " + MathUtils.round(worldPos.x*100)/100f + ", " + MathUtils.round(worldPos.y * 100)/100f, 150, 60);
+		font.draw(batch, "Remove Tile with Space", 150, 40);
+		font.draw(batch, "Show/Hide grid with G", 150, 20);
+		
 		font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 10, 20);
-		font.draw(batch, "Switch type with 1-6", Gdx.graphics.getHeight() - 100, 50);
+		font.draw(batch, "Switch type with 1-6", Gdx.graphics.getHeight() - 100, 60);
+		font.draw(batch, "Zoom with +/-", Gdx.graphics.getHeight() - 100, 40);
+		
 		font.draw(batch, renderer.getClass().getSimpleName(), Gdx.graphics.getHeight() - 100, 20);
 		batch.end();
 	}

@@ -44,6 +44,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.Vector2;
 
 public class OrthogonalTiledMapRenderer extends BatchTiledMapRenderer {
 
@@ -210,5 +211,19 @@ public class OrthogonalTiledMapRenderer extends BatchTiledMapRenderer {
 			}
 			y -= layerTileHeight;
 		}
+	}
+
+	@Override
+	public Vector2 worldToTileCoordinates (TiledMapTileLayer layer, Vector2 worldPosition) {
+		float tileX = (worldPosition.x / unitScale - layer.getRenderOffsetX()) / layer.getTileWidth();
+		float tileY = (worldPosition.y / unitScale - layer.getRenderOffsetY()) / layer.getTileHeight();
+		return worldPosition.set(tileX, tileY);
+	}
+	
+	@Override
+	public Vector2 tileToWorldCoordinates (TiledMapTileLayer layer, Vector2 tilePosition) {
+		float worldX = (tilePosition.x * layer.getTileWidth() + layer.getRenderOffsetX()) * unitScale;
+		float worldY = (tilePosition.y * layer.getTileHeight() + layer.getRenderOffsetY()) * unitScale;
+		return tilePosition.set(worldX, worldY);
 	}
 }
