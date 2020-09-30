@@ -16,22 +16,21 @@
 
 package com.badlogic.gdx.setup;
 
-import com.badlogic.gdx.setup.DependencyBank.ProjectType;
-
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.badlogic.gdx.setup.DependencyBank.ProjectType;
 
 public class ProjectBuilder {
 
 	DependencyBank bank;
 	List<ProjectType> modules = new ArrayList<ProjectType>();
 	List<Dependency> dependencies = new ArrayList<Dependency>();
-	File settingsFile;
-	File buildFile;
+	String buildContents;
+	String settingsContents;
 
 	public ProjectBuilder(DependencyBank bank) {
 		this.bank = bank;
@@ -50,53 +49,25 @@ public class ProjectBuilder {
 		return incompatibilities;
 	}
 
-	public boolean build(Language language) throws IOException {
-		settingsFile = File.createTempFile("libgdx-setup-settings", ".gradle");
-		buildFile = File.createTempFile("libgdx-setup-build", ".gradle");
-		if (!settingsFile.exists()) {
-			settingsFile.createNewFile();
-		}
-		if (!buildFile.exists()) {
-			buildFile.createNewFile();
-		}
-		settingsFile.setWritable(true);
-		buildFile.setWritable(true);
-		try {
-			FileWriter settingsWriter = new FileWriter(settingsFile.getAbsoluteFile());
-			BufferedWriter settingsBw = new BufferedWriter(settingsWriter);
-			String settingsContents = "include ";
-			for (ProjectType module : modules) {
-				settingsContents += "'" + module.getName() + "'";
-				if (modules.indexOf(module) != modules.size() - 1) {
-					settingsContents += ", ";
-				}
+	public void build(Language language) throws IOException {
+		settingsContents = "include ";
+		for (ProjectType module : modules) {
+			settingsContents += "'" + module.getName() + "'";
+			if (modules.indexOf(module) != modules.size() - 1) {
+				settingsContents += ", ";
 			}
-			settingsBw.write(settingsContents);
-			settingsBw.close();
-			settingsWriter.close();
-
-			FileWriter buildWriter = new FileWriter(buildFile.getAbsoluteFile());
-			BufferedWriter buildBw = new BufferedWriter(buildWriter);
-
-			BuildScriptHelper.addBuildScript(language, modules, buildBw);
-			BuildScriptHelper.addAllProjects(buildBw);
-			for (ProjectType module : modules) {
-				BuildScriptHelper.addProject(language, module, dependencies, buildBw);
-			}
-
-
-			buildBw.close();
-			buildWriter.close();
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
 		}
-	}
 
-	public void cleanUp() {
-		settingsFile.deleteOnExit();
-		buildFile.deleteOnExit();
+		StringWriter buildWriter = new StringWriter();
+		BufferedWriter buildBw = new BufferedWriter(buildWriter);
+		BuildScriptHelper.addBuildScript(language, modules, buildBw);
+		BuildScriptHelper.addAllProjects(buildBw);
+		for (ProjectType module : modules) {
+			BuildScriptHelper.addProject(language, module, dependencies, buildBw);
+		}
+		buildBw.close();
+		buildWriter.close();
+		buildContents = buildWriter.getBuffer().toString();
 	}
 
 }

@@ -16,21 +16,19 @@
 
 package com.badlogic.gdx.setup;
 
-import java.io.File;
-
 /**
- * A temporary file that wraps {@link ProjectFile} for use in a {@link Project}
+ * A transient (in memory) project file.
  * @author Tomski
  *
  */
-public class TemporaryProjectFile extends ProjectFile {
+public class TransientProjectFile extends ProjectFile {
 
-	/** The temporary file **/
-	public File file;
+	/** file content **/
+	public String content;
 
-	public TemporaryProjectFile(File file, String outputString, boolean isTemplate) {
-		super(outputString, isTemplate);
-		this.file = file;
+	public TransientProjectFile(String content, String name, boolean isTemplate) {
+		super(name, isTemplate);
+		this.content = content;
 	}
 
 }

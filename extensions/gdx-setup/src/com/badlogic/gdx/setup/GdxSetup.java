@@ -34,6 +34,16 @@ import com.badlogic.gdx.setup.Executor.CharCallback;
  * @author badlogic
  * @author Tomski */
 public class GdxSetup {
+	private final ProjectEmitter projectEmitter;
+
+	public GdxSetup () {
+		this(new ProjectEmitterFileSystem());
+	}
+
+	public GdxSetup (ProjectEmitter projectEmitter) {
+		this.projectEmitter = projectEmitter;
+	}
+
 	public void build (ProjectBuilder builder, String outputDir, String appName, String packageName, String mainClass,
 			Language language, String sdkLocation, CharCallback callback, List<String> gradleArgs) {
 		Project project = new Project();
@@ -47,8 +57,8 @@ public class GdxSetup {
 
 		// root dir/gradle files
 		project.files.add(new ProjectFile("gitignore", ".gitignore", false));
-		project.files.add(new TemporaryProjectFile(builder.settingsFile, "settings.gradle", false));
-		project.files.add(new TemporaryProjectFile(builder.buildFile, "build.gradle", true));
+		project.files.add(new TransientProjectFile(builder.settingsContents, "settings.gradle", false));
+		project.files.add(new TransientProjectFile(builder.buildContents, "build.gradle", true));
 		project.files.add(new ProjectFile("gradlew", false));
 		project.files.add(new ProjectFile("gradlew.bat", false));
 		project.files.add(new ProjectFile("gradle/wrapper/gradle-wrapper.jar", false));
@@ -156,24 +166,16 @@ public class GdxSetup {
 			values.put("%GWT_INHERITS%", parseGwtInherits(builder));
 		}
 
-		copyAndReplace(outputDir, project, values);
-
-		builder.cleanUp();
-
-		// HACK executable flag isn't preserved for whatever reason...
-		new File(outputDir, "gradlew").setExecutable(true);
-
-		Executor.execute(new File(outputDir), "gradlew.bat", "gradlew", "clean" + parseGradleArgs(builder.modules, gradleArgs), callback);
-	}
-
-	private void copyAndReplace (String outputDir, Project project, Map<String, String> values) {
-		File out = new File(outputDir);
-		if (!out.exists() && !out.mkdirs()) {
-			throw new RuntimeException("Couldn't create output directory '" + out.getAbsolutePath() + "'");
-		}
-
+		projectEmitter.begin(outputDir);
 		for (ProjectFile file : project.files) {
-			copyFile(file, out, values);
+			copyFile(file, values);
+		}
+		projectEmitter.end();
+
+		if(projectEmitter.isBuildable()){
+			// HACK executable flag isn't preserved for whatever reason...
+			new File(outputDir, "gradlew").setExecutable(true);
+			Executor.execute(new File(outputDir), "gradlew.bat", "gradlew", "clean" + parseGradleArgs(builder.modules, gradleArgs), callback);
 		}
 	}
 
@@ -208,19 +210,7 @@ public class GdxSetup {
 	}
 
 	private void writeFile (File outFile, byte[] bytes) {
-		OutputStream out = null;
-
-		try {
-			out = new BufferedOutputStream(new FileOutputStream(outFile));
-			out.write(bytes);
-		} catch (IOException e) {
-			throw new RuntimeException("Couldn't write file '" + outFile.getAbsolutePath() + "'", e);
-		} finally {
-			if (out != null) try {
-				out.close();
-			} catch (IOException e) {
-			}
-		}
+		projectEmitter.writeFile(outFile, bytes);
 	}
 
 	private void writeFile (File outFile, String text) {
@@ -231,26 +221,23 @@ public class GdxSetup {
 		}
 	}
 
-	private void copyFile (ProjectFile file, File out, Map<String, String> values) {
-		File outFile = new File(out, file.outputName);
-		if (!outFile.getParentFile().exists() && !outFile.getParentFile().mkdirs()) {
-			throw new RuntimeException("Couldn't create dir '" + outFile.getAbsolutePath() + "'");
-		}
+	private void copyFile (ProjectFile file, Map<String, String> values) {
+		File outFile = projectEmitter.resolveFile(file);
 
-		boolean isTemp = file instanceof TemporaryProjectFile;
+		boolean isTranscient = file instanceof TransientProjectFile;
 
 		if (file.isTemplate) {
 			String txt;
-			if (isTemp) {
-				txt = readResourceAsString(((TemporaryProjectFile)file).file);
+			if (isTranscient) {
+				txt = ((TransientProjectFile)file).content;
 			} else {
 				txt = readResourceAsString(file.resourceName, file.resourceLoc);
 			}
 			txt = replace(txt, values);
 			writeFile(outFile, txt);
 		} else {
-			if (isTemp) {
-				writeFile(outFile, readResource(((TemporaryProjectFile)file).file));
+			if (isTranscient) {
+				writeFile(outFile, ((TransientProjectFile)file).content);
 			} else {
 				writeFile(outFile, readResource(file.resourceName, file.resourceLoc));
 			}
