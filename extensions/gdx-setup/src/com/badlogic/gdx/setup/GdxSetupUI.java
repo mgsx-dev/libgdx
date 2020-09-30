@@ -89,6 +89,14 @@ import com.badlogic.gdx.setup.Executor.CharCallback;
 @SuppressWarnings("serial")
 public class GdxSetupUI extends JFrame {
 
+	public static boolean isEmptyDirectory (String destination) {
+		if (new File(destination).exists()) {
+			return new File(destination).list().length == 0;
+		} else {
+			return true;
+		}
+	}
+	
 	//DependencyBank dependencyBank;
 	ProjectBuilder builder;
 	List<ProjectType> modules = new ArrayList<ProjectType>();
@@ -168,7 +176,7 @@ public class GdxSetupUI extends JFrame {
 			JOptionPane.showMessageDialog(this, "Please enter your Android SDK's path");
 			return;
 		}
-		if (!GdxSetup.isSdkLocationValid(sdkLocation) && modules.contains(ProjectType.ANDROID)) {
+		if (!AndroidSDKHelper.isSdkLocationValid(sdkLocation) && modules.contains(ProjectType.ANDROID)) {
 			JOptionPane
 					.showMessageDialog(this,
 							"Your Android SDK path doesn't contain an SDK! Please install the Android SDK, including all platforms and build tools!");
@@ -182,8 +190,7 @@ public class GdxSetupUI extends JFrame {
 		}
 
 		if (modules.contains(ProjectType.ANDROID)) {
-			if (!GdxSetup.isSdkUpToDate(sdkLocation)) {
-				File sdkLocationFile = new File(sdkLocation);
+			if (!AndroidSDKHelper.isSdkUpToDate(sdkLocation)) {
 				try {  //give them a poke in the right direction
 					if (System.getProperty("os.name").contains("Windows")) {
 						String replaced = sdkLocation.replace("\\", "\\\\");
@@ -199,7 +206,7 @@ public class GdxSetupUI extends JFrame {
 			}
 		}
 
-		if (!GdxSetup.isEmptyDirectory(destination)) {
+		if (!isEmptyDirectory(destination)) {
 			int value = JOptionPane.showConfirmDialog(this, "The destination is not empty, do you want to overwrite?", "Warning!", JOptionPane.YES_NO_OPTION);
 			if (value != 0) {
 				return;
