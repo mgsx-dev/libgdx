@@ -254,7 +254,7 @@ public class GdxSetup {
 
 	private static void printHelp () {
 		System.out
-			.println("Usage: GdxSetup --dir <dir-name> --name <app-name> --package <package> --mainClass <mainClass> --sdkLocation <SDKLocation> [--excludeModules <modules>] [--extensions <extensions>]");
+			.println("Usage: GdxSetup --dir <dir-name> --name <app-name> --package <package> --mainClass <mainClass> --sdkLocation <SDKLocation> [--excludeModules <modules>] [--extensions <extensions>] [--outputType plain|zip]");
 		System.out.println("dir ... the directory to write the project files to");
 		System.out.println("name ... the name of the application");
 		System.out.println("package ... the Java package name of the application");
@@ -262,6 +262,7 @@ public class GdxSetup {
 		System.out.println("sdkLocation ... the location of your android SDK. Uses ANDROID_HOME if not specified. Ignored if android module is excluded");
 		System.out.println("excludeModules ... the modules to exclude on the project generation separated by ';'. Optional");
 		System.out.println("extensions ... the extensions to include in the project separated by ';'. Optional");
+		System.out.println("outputType ... whether to generate a zip file or a plain folder/file structure. Optional. Default is plain.");
 	}
 
 	private static Map<String, String> parseArgs (String[] args) {
@@ -346,12 +347,31 @@ public class GdxSetup {
 		if (params.containsKey("excludeModules"))
 			excludedModules = parseExcludedModules(params.get("excludeModules"));
 
+		String outputType = params.get("outputType");
+		boolean outputAsZip;
+		if(outputType == null || outputType.equals("plain")){
+			outputAsZip = false;
+		} else if(outputType.equals("zip")){
+			outputAsZip = true;
+		} else{
+			System.err.println("unrecognized outputType option");
+			printHelp();
+			return;
+		}
+		
+		boolean checkAndroidSDK;
+		if(outputAsZip){
+			checkAndroidSDK = false;
+		}else{
+			checkAndroidSDK = excludedModules == null || !excludedModules.contains("android");
+		}
+		boolean sdkLocationInvalid = !params.containsKey("sdkLocation") && System.getenv("ANDROID_HOME") == null;
+		
 		if (!params.containsKey("dir") ||
 			!params.containsKey("name") ||
 			!params.containsKey("package") ||
 			!params.containsKey("mainClass") ||
-			(!params.containsKey("sdkLocation") && System.getenv("ANDROID_HOME") == null &&
-				(excludedModules == null || !excludedModules.contains("android")))) {
+			checkAndroidSDK && sdkLocationInvalid) {
 			new GdxSetupUI();
 			printHelp();
 		} else {
@@ -401,7 +421,10 @@ public class GdxSetup {
 			}
 			builder.buildProject(projects, dependencies);
 			builder.build(languageEnum);
-			new GdxSetup().build(builder, params.get("dir"), params.get("name"), params.get("package"), params.get("mainClass"), languageEnum,
+			
+			final GdxSetup setup = outputAsZip ? new GdxSetup(new ProjectEmitterZip()) : new GdxSetup();
+			
+			setup.build(builder, params.get("dir"), params.get("name"), params.get("package"), params.get("mainClass"), languageEnum,
 				sdkLocation, new CharCallback() {
 					@Override
 					public void character (char c) {
