@@ -453,7 +453,7 @@ public class MultipleRenderTargetTest extends GdxTest {
 
 		@Override
 		public void end () {
-
+			shaderProgram.end();
 		}
 
 		@Override

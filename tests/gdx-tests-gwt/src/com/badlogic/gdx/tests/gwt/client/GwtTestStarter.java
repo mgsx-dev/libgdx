@@ -28,6 +28,7 @@ public class GwtTestStarter extends GwtApplication {
 		GwtApplicationConfiguration config = new GwtApplicationConfiguration(true);
 		config.useGyroscope = true;
 		config.padVertical = 150;
+		config.useGL30 = true;
 		//config.openURLInNewWindow = true;
 		return config;
 	}
