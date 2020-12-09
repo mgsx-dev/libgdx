@@ -151,7 +151,12 @@ public class MultipleRenderTargetTest extends GdxTest {
 		frameBufferBuilder.addColorTextureAttachment(GL30.GL_RGBA8, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE);
 		frameBufferBuilder.addColorTextureAttachment(GL30.GL_RGB8, GL30.GL_RGB, GL30.GL_UNSIGNED_BYTE);
 		frameBufferBuilder.addColorTextureAttachment(GL30.GL_RGB8, GL30.GL_RGB, GL30.GL_UNSIGNED_BYTE);
-		frameBufferBuilder.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT, GL30.GL_UNSIGNED_SHORT);
+		
+		// either GL_DEPTH_COMPONENT24 GL_UNSIGNED_INT
+		// or GL_DEPTH_COMPONENT32F GL_FLOAT
+		// or GL_DEPTH_COMPONENT16 GL_UNSIGNED_SHORT
+		// but GL_DEPTH_COMPONENT is not allowed as internal format for WebGL2 (it requires a fixed size)
+		frameBufferBuilder.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT16, GL30.GL_UNSIGNED_SHORT);
 
 		frameBuffer = frameBufferBuilder.build();
 
