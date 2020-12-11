@@ -146,6 +146,19 @@ public class ShaderProgram implements Disposable {
 	/** reference count **/
 	private int refCount = 0;
 
+	/**
+	 * XXX HACK in order to use vertex shader only program (for transform feedback)
+	 */
+	public ShaderProgram(int handle){
+		program = handle;
+		vertexShaderSource = "";
+		fragmentShaderSource = "";
+		this.matrix = BufferUtils.newFloatBuffer(16);
+		
+		fetchAttributes();
+		fetchUniforms();
+	}
+	
 	/** Constructs a new ShaderProgram and immediately compiles it.
 	 * 
 	 * @param vertexShader the vertex shader

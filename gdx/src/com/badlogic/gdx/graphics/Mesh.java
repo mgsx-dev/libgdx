@@ -393,6 +393,10 @@ public class Mesh implements Disposable {
 		getVerticesBuffer().position(pos);
 		return vertices;
 	}
+	
+	public VertexData getVertexData(){
+		return vertices;
+	}
 
 	/** Sets the indices of this Mesh
 	 *

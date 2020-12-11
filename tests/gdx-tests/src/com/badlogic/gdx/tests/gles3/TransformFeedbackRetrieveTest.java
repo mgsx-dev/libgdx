@@ -14,7 +14,7 @@ import com.badlogic.gdx.tests.utils.GdxTestConfig;
 import com.badlogic.gdx.utils.BufferUtils;
 
 @GdxTestConfig(requireGL30=true)
-public class TransformFeedbackTest extends GdxTest {
+public class TransformFeedbackRetrieveTest extends GdxTest {
 
 	@Override
 	public void create () {
@@ -69,6 +69,7 @@ public class TransformFeedbackTest extends GdxTest {
 		
 		// disable rasterization in our case (no rendering, simply transform)
 		Gdx.gl.glEnable(GL30.GL_RASTERIZER_DISCARD);
+		
 		
 		// perform transformation
 		Gdx.gl30.glBindBufferBase(GL30.GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);

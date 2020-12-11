@@ -78,6 +78,8 @@ import com.badlogic.gdx.tests.g3d.utils.DefaultTextureBinderTest;
 import com.badlogic.gdx.tests.gles2.HelloTriangle;
 import com.badlogic.gdx.tests.gles2.SimpleVertexShader;
 import com.badlogic.gdx.tests.gles3.InstancedRenderingTest;
+import com.badlogic.gdx.tests.gles3.TransformFeedbackDrawTest;
+import com.badlogic.gdx.tests.gles3.TransformFeedbackRetrieveTest;
 import com.badlogic.gdx.tests.net.NetAPITest;
 import com.badlogic.gdx.tests.superkoalio.SuperKoalio;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -276,6 +278,8 @@ public class GdxTests {
 		TimerTest.class,
 		TimeUtilsTest.class,
 		TouchpadTest.class,
+		TransformFeedbackDrawTest.class,
+		TransformFeedbackRetrieveTest.class,
 		TreeTest.class,
 		UISimpleTest.class,
 		UITest.class,
