@@ -39,7 +39,7 @@ public class LwjglApplicationConfiguration {
 	public int maxNetThreads = Integer.MAX_VALUE;
 
 	/** whether to attempt use OpenGL ES 3.0. **/
-	public boolean useGL30 = false;
+	public int glApi = 20;
 	/** The OpenGL context major version (the part in front of the decimal point) used to emulate OpenGL ES 3.0, when the version
 	 * is not supported it will fall back to OpenGL ES 2.0 emulation. Defaults to 3.2 (major=3, minor=2). Only used when
 	 * {@link #useGL30} is true. OpenGL is fully compatible with OpenGL ES 3.0 since version 4.3, setting the context version to a

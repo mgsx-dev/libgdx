@@ -31,7 +31,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 
-@GdxTestConfig(requireGL30=true)
+@GdxTestConfig(minGlApi=30)
 public class InstancedRenderingTest extends GdxTest {
 
 	ShaderProgram shader;

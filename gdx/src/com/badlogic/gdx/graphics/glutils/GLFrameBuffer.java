@@ -79,6 +79,9 @@ public abstract class GLFrameBuffer<T extends GLTexture> implements Disposable {
 
 	/** if multiple texture attachments are present **/
 	protected boolean isMRT;
+	
+	/** multisample render buffer, 0 to disable (disabled by default) */
+	protected int samples = 0;
 
 	protected GLFrameBufferBuilder<? extends GLFrameBuffer<T>> bufferBuilder;
 
@@ -132,24 +135,36 @@ public abstract class GLFrameBuffer<T extends GLTexture> implements Disposable {
 
 		int width = bufferBuilder.width;
 		int height = bufferBuilder.height;
+		samples = bufferBuilder.samples;
 
 		if (bufferBuilder.hasDepthRenderBuffer) {
 			depthbufferHandle = gl.glGenRenderbuffer();
 			gl.glBindRenderbuffer(GL20.GL_RENDERBUFFER, depthbufferHandle);
-			gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, bufferBuilder.depthRenderBufferSpec.internalFormat, width, height);
+			if(samples > 0){
+				Gdx.gl30.glRenderbufferStorageMultisample(GL20.GL_RENDERBUFFER, samples, bufferBuilder.depthRenderBufferSpec.internalFormat, width, height);
+			}else{
+				gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, bufferBuilder.depthRenderBufferSpec.internalFormat, width, height);
+			}
 		}
 
 		if (bufferBuilder.hasStencilRenderBuffer) {
 			stencilbufferHandle = gl.glGenRenderbuffer();
 			gl.glBindRenderbuffer(GL20.GL_RENDERBUFFER, stencilbufferHandle);
-			gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, bufferBuilder.stencilRenderBufferSpec.internalFormat, width, height);
+			if(samples > 0){
+				Gdx.gl30.glRenderbufferStorageMultisample(GL20.GL_RENDERBUFFER, samples, bufferBuilder.stencilRenderBufferSpec.internalFormat, width, height);
+			}else{
+				gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, bufferBuilder.stencilRenderBufferSpec.internalFormat, width, height);
+			}
 		}
 
 		if (bufferBuilder.hasPackedStencilDepthRenderBuffer) {
 			depthStencilPackedBufferHandle = gl.glGenRenderbuffer();
 			gl.glBindRenderbuffer(GL20.GL_RENDERBUFFER, depthStencilPackedBufferHandle);
-			gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, bufferBuilder.packedStencilDepthRenderBufferSpec.internalFormat, width,
-				height);
+			if(samples > 0){
+				Gdx.gl30.glRenderbufferStorageMultisample(GL20.GL_RENDERBUFFER, samples, bufferBuilder.packedStencilDepthRenderBufferSpec.internalFormat, width, height);
+			}else{
+				gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, bufferBuilder.packedStencilDepthRenderBufferSpec.internalFormat, width, height);
+			}
 		}
 
 		isMRT = bufferBuilder.textureAttachmentSpecs.size > 1;
@@ -226,7 +241,12 @@ public abstract class GLFrameBuffer<T extends GLTexture> implements Disposable {
 			depthStencilPackedBufferHandle = gl.glGenRenderbuffer();
 			hasDepthStencilPackedBuffer = true;
 			gl.glBindRenderbuffer(GL20.GL_RENDERBUFFER, depthStencilPackedBufferHandle);
-			gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, width, height);
+			if(samples > 0){
+				Gdx.gl30.glRenderbufferStorageMultisample(GL20.GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8_OES, width, height);
+			}else{
+				gl.glRenderbufferStorage(GL20.GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, width, height);
+			}
+			
 			gl.glBindRenderbuffer(GL20.GL_RENDERBUFFER, 0);
 
 			gl.glFramebufferRenderbuffer(GL20.GL_FRAMEBUFFER, GL20.GL_DEPTH_ATTACHMENT, GL20.GL_RENDERBUFFER,
@@ -453,9 +473,16 @@ public abstract class GLFrameBuffer<T extends GLTexture> implements Disposable {
 		protected boolean hasDepthRenderBuffer;
 		protected boolean hasPackedStencilDepthRenderBuffer;
 
+		protected int samples;
+
 		public GLFrameBufferBuilder (int width, int height) {
+			this(width, height, 0);
+		}
+		
+		public GLFrameBufferBuilder (int width, int height, int samples) {
 			this.width = width;
 			this.height = height;
+			this.samples = samples;
 		}
 
 		public GLFrameBufferBuilder<U> addColorTextureAttachment (int internalFormat, int format, int type) {
@@ -529,6 +556,9 @@ public abstract class GLFrameBuffer<T extends GLTexture> implements Disposable {
 	public static class FrameBufferBuilder extends GLFrameBufferBuilder<FrameBuffer> {
 		public FrameBufferBuilder (int width, int height) {
 			super(width, height);
+		}
+		public FrameBufferBuilder (int width, int height, int samples) {
+			super(width, height, samples);
 		}
 
 		@Override

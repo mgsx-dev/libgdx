@@ -38,7 +38,7 @@ import com.badlogic.gdx.tests.utils.GdxTest;
 import com.badlogic.gdx.tests.utils.GdxTestConfig;
 
 /** @author Tomski **/
-@GdxTestConfig(requireGL30=true)
+@GdxTestConfig(minGlApi=30)
 public class TextureArrayTest extends GdxTest {
 
 	TextureArray textureArray;

@@ -77,8 +77,8 @@ public class FrameBuffer extends GLFrameBuffer<Texture> {
 
 	@Override
 	protected Texture createTexture (FrameBufferTextureAttachmentSpec attachmentSpec) {
-		GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat, attachmentSpec.format, attachmentSpec.type);
-		Texture result = new Texture(data);
+		GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat, attachmentSpec.format, attachmentSpec.type, samples);
+		Texture result = new Texture(data, samples > 0);
 		result.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		result.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
 		return result;
@@ -91,7 +91,7 @@ public class FrameBuffer extends GLFrameBuffer<Texture> {
 
 	@Override
 	protected void attachFrameBufferColorTexture (Texture texture) {
-		Gdx.gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, GL20.GL_TEXTURE_2D, texture.getTextureObjectHandle(), 0);
+		Gdx.gl20.glFramebufferTexture2D(GL20.GL_FRAMEBUFFER, GL20.GL_COLOR_ATTACHMENT0, texture.glTarget, texture.getTextureObjectHandle(), 0);
 	}
 
 	/** See {@link GLFrameBuffer#unbind()} */

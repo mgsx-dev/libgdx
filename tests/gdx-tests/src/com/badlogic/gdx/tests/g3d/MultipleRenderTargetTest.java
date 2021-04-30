@@ -59,7 +59,7 @@ import com.badlogic.gdx.utils.*;
  * Thanks to http://www.blendswap.com/blends/view/73922 for the cannon model, licensed under CC-BY-SA
  *
  /** @author Tomski */
-@GdxTestConfig(requireGL30=true)
+@GdxTestConfig(minGlApi=30)
 public class MultipleRenderTargetTest extends GdxTest {
 
 	RenderContext renderContext;

@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface GdxTestConfig {
-	boolean requireGL30() default false;
+	int minGlApi() default 20;
 }

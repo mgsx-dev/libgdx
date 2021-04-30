@@ -15,7 +15,7 @@ import com.badlogic.gdx.tests.utils.GdxTest;
 import com.badlogic.gdx.tests.utils.GdxTestConfig;
 import com.badlogic.gdx.utils.BufferUtils;
 
-@GdxTestConfig(requireGL30=true)
+@GdxTestConfig(minGlApi=30)
 public class PixelBufferObjectTest extends GdxTest {
 
 	private SpriteBatch batch;

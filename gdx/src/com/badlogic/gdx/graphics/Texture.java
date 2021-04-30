@@ -141,6 +141,9 @@ public class Texture extends GLTexture {
 	public Texture (TextureData data) {
 		this(GL20.GL_TEXTURE_2D, Gdx.gl.glGenTexture(), data);
 	}
+	public Texture (TextureData data, boolean multisample) {
+		this(multisample ? GL31.GL_TEXTURE_2D_MULTISAMPLE :  GL20.GL_TEXTURE_2D, Gdx.gl.glGenTexture(), data);
+	}
 
 	protected Texture (int glTarget, int glHandle, TextureData data) {
 		super(glTarget, glHandle);
@@ -156,7 +159,7 @@ public class Texture extends GLTexture {
 		if (!data.isPrepared()) data.prepare();
 
 		bind();
-		uploadImageData(GL20.GL_TEXTURE_2D, data);
+		uploadImageData(glTarget, data);
 
 		unsafeSetFilter(minFilter, magFilter, true);
 		unsafeSetWrap(uWrap, vWrap, true);

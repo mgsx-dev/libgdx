@@ -43,7 +43,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-@GdxTestConfig(requireGL30=true)
+@GdxTestConfig(minGlApi=30)
 public class VBOWithVAOPerformanceTest extends GdxTest {
 
 	ShaderProgram shader;

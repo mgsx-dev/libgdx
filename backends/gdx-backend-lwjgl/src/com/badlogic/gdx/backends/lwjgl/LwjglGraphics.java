@@ -29,7 +29,6 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL32;
 import org.lwjgl.opengl.PixelFormat;
 
 import com.badlogic.gdx.Gdx;
@@ -37,6 +36,8 @@ import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
+import com.badlogic.gdx.graphics.GL31;
+import com.badlogic.gdx.graphics.GL32;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Blending;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -54,6 +55,9 @@ public class LwjglGraphics extends AbstractGraphics {
 
 	GL20 gl20;
 	GL30 gl30;
+	GL31 gl31;
+	GL32 gl32;
+	
 	long frameId = -1;
 	float deltaTime;
 	boolean resetDeltaTime;
@@ -70,7 +74,7 @@ public class LwjglGraphics extends AbstractGraphics {
 	volatile boolean requestRendering = false;
 	volatile boolean forceDisplayModeChange = false;
 	boolean softwareMode;
-	boolean usingGL30;
+	int glApi;
 
 	LwjglGraphics (LwjglApplicationConfiguration config) {
 		this.config = config;
@@ -259,7 +263,7 @@ public class LwjglGraphics extends AbstractGraphics {
 			config.initialBackgroundColor.b);
 
 		Display.setLocation(config.x, config.y);
-		createDisplayPixelFormat(config.useGL30, config.gles30ContextMajorVersion, config.gles30ContextMinorVersion);
+		createDisplayPixelFormat(config.glApi, config.gles30ContextMajorVersion, config.gles30ContextMinorVersion);
 		initiateGL();
 	}
 
@@ -317,15 +321,15 @@ public class LwjglGraphics extends AbstractGraphics {
 	 * @param enable */
 	public void enableCubeMapSeamless (boolean enable) {
 		if (enable) {
-			gl20.glEnable(GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS);
+			gl20.glEnable(org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		} else {
-			gl20.glDisable(GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS);
+			gl20.glDisable(org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		}
 	}
 
-	private void createDisplayPixelFormat (boolean useGL30, int gles30ContextMajor, int gles30ContextMinor) {
+	private void createDisplayPixelFormat (int glApi, int gles30ContextMajor, int gles30ContextMinor) {
 		try {
-			if (useGL30) {
+			if (glApi >= 30) {
 				ContextAttribs context = new ContextAttribs(gles30ContextMajor, gles30ContextMinor).withForwardCompatible(false)
 					.withProfileCore(true);
 				try {
@@ -335,16 +339,16 @@ public class LwjglGraphics extends AbstractGraphics {
 				} catch (Exception e) {
 					System.out.println("LwjglGraphics: OpenGL " + gles30ContextMajor + "." + gles30ContextMinor
 						+ "+ core profile (GLES 3.0) not supported.");
-					createDisplayPixelFormat(false, gles30ContextMajor, gles30ContextMinor);
+					createDisplayPixelFormat(glApi, gles30ContextMajor, gles30ContextMinor);
 					return;
 				}
 				System.out.println("LwjglGraphics: created OpenGL " + gles30ContextMajor + "." + gles30ContextMinor
 					+ "+ core profile (GLES 3.0) context. This is experimental!");
-				usingGL30 = true;
+				this.glApi = glApi;
 			} else {
 				Display
 					.create(new PixelFormat(config.r + config.g + config.b, config.a, config.depth, config.stencil, config.samples));
-				usingGL30 = false;
+				this.glApi = 20;
 			}
 			bufferFormat = new BufferFormat(config.r, config.g, config.b, config.a, config.depth, config.stencil, config.samples,
 				false);
@@ -378,7 +382,7 @@ public class LwjglGraphics extends AbstractGraphics {
 					if (!softwareMode && config.allowSoftwareMode) {
 						softwareMode = true;
 						System.setProperty("org.lwjgl.opengl.Display.allowSoftwareOpenGL", "true");
-						createDisplayPixelFormat(useGL30, gles30ContextMajor, gles30ContextMinor);
+						createDisplayPixelFormat(glApi, gles30ContextMajor, gles30ContextMinor);
 						return;
 					}
 					throw new GdxRuntimeException("OpenGL is not supported by the video driver.", ex3);
@@ -397,13 +401,24 @@ public class LwjglGraphics extends AbstractGraphics {
 	}
 
 	public void initiateGLInstances () {
-		if (usingGL30) {
-			gl30 = new LwjglGL30();
-			gl20 = gl30;
-		} else {
-			gl20 = new LwjglGL20();
+		switch(glApi){
+		case 32: gl32 = new LwjglGL32(); break;
+		case 31: gl31 = new LwjglGL31(); break;
+		case 30: gl30 = new LwjglGL30(); break;
+		case 20: gl20 = new LwjglGL20(); break;
+		default: throw new GdxRuntimeException("unsupported glApi " + glApi);
 		}
-
+		if(gl32 != null) gl31 = gl32;
+		if(gl31 != null) gl30 = gl31;
+		if(gl30 != null) gl20 = gl30;
+		if(gl20 == null) throw new GdxRuntimeException("wrong GL API version: " + glApi);
+		
+		Gdx.gl32 = gl32;
+		Gdx.gl31 = gl31;
+		Gdx.gl30 = gl30;
+		Gdx.gl20 = gl20;
+		Gdx.gl = gl20;
+		
 		if (!glVersion.isVersionEqualToOrHigher(2, 0))
 			throw new GdxRuntimeException("OpenGL 2.0 or higher with the FBO extension is required. OpenGL version: "
 				+ GL11.glGetString(GL11.GL_VERSION) + "\n" + glVersion.getDebugVersionString());
@@ -412,10 +427,6 @@ public class LwjglGraphics extends AbstractGraphics {
 			throw new GdxRuntimeException("OpenGL 2.0 or higher with the FBO extension is required. OpenGL version: "
 				+ GL11.glGetString(GL11.GL_VERSION) + ", FBO extension: false\n" + glVersion.getDebugVersionString());
 		}
-
-		Gdx.gl = gl20;
-		Gdx.gl20 = gl20;
-		Gdx.gl30 = gl30;
 
 		if (supportsCubeMapSeamless()) {
 			enableCubeMapSeamless(true);

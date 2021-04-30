@@ -15,14 +15,16 @@ import com.badlogic.gdx.utils.Array;
 public class CommandLineOptions {
 	
 	public String startupTestName = null;
-	public boolean gl30 = false;
+	public int glApi = 20;
 	public boolean logGLErrors = false;
 	
 	public CommandLineOptions (String [] argv) {
 		Array<String> args = new Array<String>(argv);
 		for(String arg : args){
 			if(arg.startsWith("-")){
-				if(arg.equals("--gl30")) gl30 = true;
+				if(arg.equals("--gl30")) glApi = 30;
+				else if(arg.equals("--gl31")) glApi = 31;
+				else if(arg.equals("--gl32")) glApi = 32;
 				else if(arg.equals("--glErrors")) logGLErrors = true;
 				else System.err.println("skip unrecognized option " + arg);
 			}else{
@@ -35,7 +37,7 @@ public class CommandLineOptions {
 		final Class<? extends GdxTest> clazz = GdxTests.forName(testName);
 		GdxTestConfig config = clazz.getAnnotation(GdxTestConfig.class);
 		if(config != null){
-			if(config.requireGL30() && !gl30) return false;
+			if(glApi < config.minGlApi()) return false;
 		}
 		return true;
 	}

@@ -37,6 +37,7 @@ public class GLOnlyTextureData implements TextureData {
 	int internalFormat;
 	int format;
 	int type;
+	int samples;
 
 	/** @see "https://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexImage2D.xml"
 	 * @param internalFormat Specifies the internal format of the texture. Must be one of the following symbolic constants:
@@ -48,13 +49,14 @@ public class GLOnlyTextureData implements TextureData {
 	 * @param type Specifies the data type of the texel data. The following symbolic values are accepted:
 	 *           {@link GL20#GL_UNSIGNED_BYTE}, {@link GL20#GL_UNSIGNED_SHORT_5_6_5}, {@link GL20#GL_UNSIGNED_SHORT_4_4_4_4}, and
 	 *           {@link GL20#GL_UNSIGNED_SHORT_5_5_5_1}. */
-	public GLOnlyTextureData (int width, int height, int mipMapLevel, int internalFormat, int format, int type) {
+	public GLOnlyTextureData (int width, int height, int mipMapLevel, int internalFormat, int format, int type, int samples) {
 		this.width = width;
 		this.height = height;
 		this.mipLevel = mipMapLevel;
 		this.internalFormat = internalFormat;
 		this.format = format;
 		this.type = type;
+		this.samples = samples;
 	}
 
 	@Override
@@ -76,6 +78,9 @@ public class GLOnlyTextureData implements TextureData {
 	@Override
 	public void consumeCustomData (int target) {
 		Gdx.gl.glTexImage2D(target, mipLevel, internalFormat, width, height, 0, format, type, null);
+		if(samples > 0){
+			Gdx.gl31.glTexImage2DMultisample(target, samples, internalFormat, width, height, false);
+		}
 	}
 
 	@Override

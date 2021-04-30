@@ -110,7 +110,7 @@ public class FrameBufferCubemap extends GLFrameBuffer<Cubemap> {
 
 	@Override
 	protected Cubemap createTexture (FrameBufferTextureAttachmentSpec attachmentSpec) {
-		GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat, attachmentSpec.format, attachmentSpec.type);
+		GLOnlyTextureData data = new GLOnlyTextureData(bufferBuilder.width, bufferBuilder.height, 0, attachmentSpec.internalFormat, attachmentSpec.format, attachmentSpec.type, samples);
 		Cubemap result = new Cubemap(data, data, data, data, data, data);
 		result.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		result.setWrap(TextureWrap.ClampToEdge, TextureWrap.ClampToEdge);
