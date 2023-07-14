@@ -50,23 +50,20 @@ public class GL31FrameBufferMultisampleMRTTest extends GdxTest {
 		fboMS = new FrameBufferBuilder(64, 64, nbSamples)
 			.addColorTextureAttachment(GL30.GL_RGBA8, GL20.GL_RGBA, GL30.GL_UNSIGNED_BYTE)
 			.addColorTextureAttachment(GL30.GL_RGBA8, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE)
-//			.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT24, GL30.GL_UNSIGNED_INT)
-//			.addStencilTextureAttachment(GL30.GL_STENCIL_INDEX8, GL20.GL_UNSIGNED_BYTE)
-			.addBasicStencilRenderBuffer()
-			.addBasicDepthRenderBuffer()
-//			.addBasicStencilDepthPackedRenderBuffer()
+// .addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT24, GL30.GL_UNSIGNED_INT)
+// .addStencilTextureAttachment(GL30.GL_STENCIL_INDEX8, GL20.GL_UNSIGNED_BYTE)
+			.addBasicStencilRenderBuffer().addBasicDepthRenderBuffer()
+// .addBasicStencilDepthPackedRenderBuffer()
 			.build();
 
-		fbo = new FrameBufferBuilder(64, 64)
-			.addColorTextureAttachment(GL30.GL_RGBA8, GL20.GL_RGBA, GL30.GL_UNSIGNED_BYTE)
+		fbo = new FrameBufferBuilder(64, 64).addColorTextureAttachment(GL30.GL_RGBA8, GL20.GL_RGBA, GL30.GL_UNSIGNED_BYTE)
 			.addColorTextureAttachment(GL30.GL_RGBA8, GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE)
-			.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT24, GL30.GL_UNSIGNED_INT)
-			.build();
+			.addDepthTextureAttachment(GL30.GL_DEPTH_COMPONENT24, GL30.GL_UNSIGNED_INT).build();
 
-		for(Texture t : fbo.getTextureAttachments()){
+		for (Texture t : fbo.getTextureAttachments()) {
 			t.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 		}
-		for(Texture t : fboMS.getTextureAttachments()){
+		for (Texture t : fboMS.getTextureAttachments()) {
 			t.setFilter(TextureFilter.Nearest, TextureFilter.Nearest);
 		}
 
@@ -113,7 +110,7 @@ public class GL31FrameBufferMultisampleMRTTest extends GdxTest {
 
 		batch.begin();
 		int y = 0;
-		for(Texture t : fbo.getTextureAttachments()){
+		for (Texture t : fbo.getTextureAttachments()) {
 			batch.draw(t, 0, y++, 1, 1, 0, 0, 1, 1);
 		}
 		batch.end();
@@ -129,7 +126,7 @@ public class GL31FrameBufferMultisampleMRTTest extends GdxTest {
 
 		batch.begin();
 		y = 0;
-		for(Texture t : fboMS.getTextureAttachments()){
+		for (Texture t : fboMS.getTextureAttachments()) {
 			batch.draw(t, 1, y++, 1, 1, 0, 0, 1, 1);
 		}
 		batch.end();
